@@ -1,0 +1,50 @@
+Explain in brief
+
+● Differences between HBASE and HDFS.
+HBASE	 vs HDFS.
+
+HBase is a database built on top of the HDFS while HDFS is a distributed file system suitable for storing large files.
+HBase provides fast lookups for larger tables whereas	HDFS does not support fast individual record lookups.
+It provides low latency access to single rows from billions of records (Random access) and on the other hand provides high latency batch processing; no concept of batch processing.
+HBase internally uses Hash tables and provides random access, and it stores the data in indexed HDFS files for faster lookups while HDFS provides only sequential access of data.
+Hbase can be updated but HDFS files are write once files.
+
+● List and explain the main components of HBASE.
+HBase is composed of three types of servers in a master slave type of architecture. 
+1.Region servers serve data for reads and writes. 
+ 2.HBase Master process handles the Region assignment, DDL (create, delete tables) operations 
+3.Zookeeper maintains a live cluster state.
+
+Region server
+Region Server runs on an HDFS data node and has the following components: 
+WAL 
+ Write Ahead Log is a file on the distributed file system. The WAL is used to store new data that hasn't yet been persisted to permanent storage; it is used for recovery in the case of failure. 
+BlockCache  
+It is the read cache. It stores frequently read data in memory. Least Recently Used data is evicted when full.
+ MemStore 
+ It is the write cache. It stores new data which has not yet been written to disk. It is sorted before writing to disk. There is one MemStore per column family per region.
+ Hfiles 
+ They store the rows as sorted KeyValues on disk.
+
+
+
+MasterServer
+The master server performs the following function
+1.Assigns regions to the region servers and takes the help of Apache ZooKeeper for this task.
+2.Handles load balancing of the regions across region servers. It unloads the busy servers and shifts the regions to less occupied servers.
+3.Maintains the state of the cluster by negotiating the load balancing.
+4.Is responsible for schema changes and other metadata operations such as creation of tables and column families.
+
+zookeeper
+1.Zookeeper is an open-source project that provides services like maintaining configuration information, naming, providing distributed synchronization, etc.
+2.Zookeeper has ephemeral nodes representing different region servers. Master servers use these nodes to discover available servers.
+3.In addition to availability, the nodes are also used to track server failures or network partitions.
+4.Clients communicate with region servers via zookeeper.
+5.In pseudo and standalone modes, HBase itself will take care of zookeeper.
+
+● Does Hbase support sql?
+Although HBase is a No SQL database  which only support CRUD Operation which means CREATE,READ,UPDATE,DELETE and it does not support commands like group by etc
+But still it can be achieved by apache phoenix 
+Apache Phoenix takes your SQL query, compiles it into a series of HBase scans, and orchestrates the running of those scans to produce regular JDBC result sets. Direct use of the HBase API, along with coprocessors and custom filters, results in performance on the order of milliseconds for small queries, or seconds for tens of millions of rows.
+All standard SQL query constructs are supported, including SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY, etc. It also supports a full set of DML commands as well as table creation and versioned incremental alterations through our DDL commands.
+
